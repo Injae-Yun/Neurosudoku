@@ -79,11 +79,11 @@ This project evolved through rigorous failure analysis:
 * PyTorch & PyTorch Geometric
 
 ### Installation
-'''bash
+
 git clone [https://github.com/YourUsername/NeuroSudoku.git](https://github.com/YourUsername/NeuroSudoku.git)
 cd NeuroSudoku
 pip install -r requirements.txt
-'''
+
 
 ### Train 
 python experiments/train.py --epochs 10 --batch_size 64
@@ -95,7 +95,6 @@ python main.py --input "80000000000360000007009020005000700000004570000010003000
 python experiments/evaluate_hard.py --samples 200
 
 ### Directory Structure
-'''text
 NeuroSudoku/
 ├── data/               # Dataset processing
 ├── models/             # GATv2 + GRU Architecture
@@ -107,4 +106,22 @@ NeuroSudoku/
 │   └── evaluate .. .py # model evaluating 
 ├── utils/              # Graph conversion & Visualization
 └── main.py             # CLI Entry point
-'''
+
+```text
+NeuroSudoku/
+├── data/               # Dataset processing
+│   ├── raw/            # Raw csv files
+│   └── dataset.py      # PyG Dataset implementation
+├── models/             # GNN Architecture
+│   └── gnn_solver.py   # GATv2 + GRU Model
+├── solvers/            # Solving Logic
+│   ├── propagation.py  # Constraint Propagation (Logic)
+│   └── dynamic_solver.py # Dynamic Ordering Solver (Final)
+├── experiments/        # Scripts
+│   ├── train.py        # Model Training
+│   ├── evaluate.py     # General Benchmark
+│   └── evaluate_hard.py # Hard Case Benchmark
+├── utils/              # Utilities
+│   ├── graph_utils.py  # Graph conversion
+│   └── visualize.py    # Visualization
+└── main.py             # CLI Entry point
