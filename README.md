@@ -54,6 +54,7 @@ The true power of the GNN heuristic is revealed in adversarial puzzles designed 
 | Norvig #2 | > 60.00s | > 60.00s | *DRAW (Too Hard)* |
 
 ![Extreme Benchmark Graph](benchmark_extreme.png)
+*(Generated via `experiments/evaluate_extream_case.py`)*
 
 ### 📊 Critical Analysis
 1.  **Optimization via Logic:** For simple puzzles (Easy), the **Constraint Propagation** module solves the board deterministically without invoking the heavy GNN, ensuring the system is lightweight.
