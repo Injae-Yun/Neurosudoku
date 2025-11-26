@@ -28,7 +28,8 @@ Our solver is not just a neural network; it is a layered system.
 | Difficulty | Source | Backtracking (CPU) | **Neuro-Symbolic (Ours)** | Dominant Mechanism |
 | :--- | :--- | :--- | :--- | :--- |
 | **Easy** | Kaggle (90k) | **< 0.001s** | **~0.002s** | **Symbolic Logic** (Skipped GNN) |
-| **Hard** | Kaggle (Top 1%) | **~0.007s** | ~0.041s | Trade-off (GNN Overhead) |
+| **Hard** | Kaggle (Top 0.05%) | **~0.007s** | ~0.041s | not solved only use propagate_constraints
+Trade-off (GNN Overhead) |
 | **Extreme** | **World's Hardest** | > 60.00s (Timeout) | **~0.52s** | **Easter Monster** (largest difference case) |
 
 > **Key Insight:** By integrating **Constraint Propagation**, our system avoids unnecessary GPU inference on trivial puzzles, maintaining near-zero latency for easy tasks while scaling robustly to NP-hard instances.
