@@ -118,7 +118,7 @@ pip install -r requirements.txt
 python experiments/train.py --epochs 10 --batch_size 64
 
 ### solve (extream case)
-python main.py --input "800000000003600000070090200050007000000045700000100030001000068008500010090000400"
+python experiments/evaluate_extream_case.py 
 
 ### run benchmarks : Compare Neuro-Symbolic vs Backtracking on hard cases.
 python experiments/evaluate_hard.py --samples 200
