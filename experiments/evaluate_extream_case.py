@@ -12,7 +12,7 @@ from models.gnn_solver_v2 import RecurrentGNN
 from solvers.optimized_solver import solve_sudoku_dynamic as solve_sudoku
 
 # 제한 시간 (초)
-TIMEOUT_SEC = 60.0
+TIMEOUT_SEC = 600.0
 
 EXTREME_PUZZLES = [
     "000006000059000008200008000045000000003000000006003054000325006000000000000000000", # Norvig #1

@@ -76,7 +76,7 @@ def recursive_dynamic_solve(board, cached_probs, start_time, timeout, steps):
         if success:
             return True, final_board
         
-        # ★★★ [핵심 수정] 타임아웃 전파 (Signal Propagation) ★★★
+        # 타임아웃 전파 (Signal Propagation) ★★★
         # 하위 재귀가 'None'을 리턴했다면, 이는 단순 실패가 아니라 '타임아웃'임.
         # 따라서 나도 즉시 'None'을 리턴해서 상위로 알려야 함.
         if final_board is None:
