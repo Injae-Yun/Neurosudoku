@@ -83,7 +83,7 @@ This project evolved through rigorous failure analysis:
 git clone [https://github.com/YourUsername/NeuroSudoku.git](https://github.com/YourUsername/NeuroSudoku.git)
 cd NeuroSudoku
 pip install -r requirements.txt
-
+```
 
 ### Train 
 python experiments/train.py --epochs 10 --batch_size 64
@@ -109,3 +109,4 @@ NeuroSudoku/
 │   ├── graph_utils.py  # Graph conversion
 │   └── visualize.py    # Visualization
 └── main.py             # CLI Entry point
+```
