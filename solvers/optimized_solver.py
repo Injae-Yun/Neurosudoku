@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import time
 import sys
 import os
 
@@ -12,7 +13,6 @@ def get_valid_candidates(board, row, col):
     해당 셀에 들어갈 수 있는 유효한 숫자 리스트 반환 (Logic)
     """
     candidates = []
-    # 미리 1~9 Set에서 행/열/박스 숫자를 빼는 방식이 빠름
     existing = set()
     existing.update(board[row, :])
     existing.update(board[:, col])
@@ -24,29 +24,35 @@ def get_valid_candidates(board, row, col):
             candidates.append(num)
     return candidates
 
-def recursive_dynamic_solve(board, cached_probs):
+def recursive_dynamic_solve(board, cached_probs, start_time, timeout, steps):
     """
-    1. Variable Ordering: 후보가 가장 적은 칸을 동적으로 선택 (Logic)
-    2. Value Ordering: 선택된 칸의 후보 중 GNN 확률이 높은 순서로 시도 (GNN)
+    Args:
+        steps: [int] 리스트 (Call by Reference로 카운터 공유)
     """
-    
-    # 1. 가장 '급한' 빈칸 찾기 (Minimum Remaining Values Heuristic)
+    # ---------------------------------------------------------
+    # 1. 타임아웃 체크
+    # ---------------------------------------------------------
+    steps[0] += 1
+    # 1000번마다 체크 (너무 자주 체크하면 time.time 오버헤드 발생, 너무 적으면 반응 느림)
+    if steps[0] % 2000 == 0:
+        if timeout > 0 and (time.time() - start_time > timeout):
+            return False, None # 타임아웃 발생 시그널 (None)
+
+    # 2. MRV (Most Constrained Variable) 찾기
     best_r, best_c = -1, -1
-    min_len = 10 # 후보 개수는 최대 9개이므로 10으로 초기화
+    min_len = 10 
     best_candidates = []
     
-    # 빈칸이 있는지 확인 + 동시에 최적의 빈칸 탐색
-    # (이중 루프가 매번 돌지만, 빈칸 개수가 줄어들수록 빨라짐)
     empty_cells = np.argwhere(board == 0)
     
     if len(empty_cells) == 0:
-        return True, board # 다 채움 (성공)
+        return True, board # 성공
 
     for r, c in empty_cells:
         cands = get_valid_candidates(board, r, c)
         
         if len(cands) == 0:
-            return False, None # 후보가 없는 빈칸 발견 -> 모순 (Backtrack)
+            return False, board # 단순 실패 (Backtrack) - 보드는 그대로 리턴
         
         if len(cands) < min_len:
             min_len = len(cands)
@@ -54,49 +60,57 @@ def recursive_dynamic_solve(board, cached_probs):
             best_candidates = cands
             
             if min_len == 1:
-                break # 후보가 1개면 더 볼 것도 없이 얘부터 해야 함 (최적화)
+                break 
 
-    # 2. 값 정렬 (GNN Probability)
-    # best_candidates 리스트의 숫자들을 GNN 확률이 높은 순서대로 정렬
+    # 3. GNN Value Ordering
     idx = best_r * 9 + best_c
-    cell_probs = cached_probs[idx] # Tensor [9]
-    
-    # 후보 숫자(val)에 대해 cached_probs[val-1] 값을 기준으로 내림차순 정렬
-    # (Python sort가 작은 리스트에서는 매우 빠름)
+    cell_probs = cached_probs[idx] 
     best_candidates.sort(key=lambda val: cell_probs[val-1].item(), reverse=True)
     
-    # 3. Recursion
+    # 4. Recursion
     for num in best_candidates:
         board[best_r, best_c] = num
         
-        success, final_board = recursive_dynamic_solve(board, cached_probs)
+        success, final_board = recursive_dynamic_solve(board, cached_probs, start_time, timeout, steps)
+        
         if success:
             return True, final_board
         
-        board[best_r, best_c] = 0 # Backtrack
+        # ★★★ [핵심 수정] 타임아웃 전파 (Signal Propagation) ★★★
+        # 하위 재귀가 'None'을 리턴했다면, 이는 단순 실패가 아니라 '타임아웃'임.
+        # 따라서 나도 즉시 'None'을 리턴해서 상위로 알려야 함.
+        if final_board is None:
+            return False, None
 
-    return False, None
+        # 타임아웃이 아니면(단순 실패면) 원상복구하고 다음 숫자 시도
+        board[best_r, best_c] = 0 
 
-def solve_sudoku_optimized(input_str, model, device):
+    return False, board # 모든 숫자가 안 맞음 (단순 실패)
+
+def solve_sudoku_dynamic(input_str, model, device, timeout=0.0):
+    start_time = time.time()
+    
     # 1. Init
     initial_board = np.array([int(c) for c in input_str]).reshape(9, 9)
     edge_index = get_sudoku_edges().to(device)
     
-    # 2. Constraint Propagation (Pre-processing)
+    # 2. Constraint Propagation
     board, solved, contradiction = propagate_constraints(initial_board)
-    if contradiction: return False, None
+    if contradiction: return False, None # 모순
     if solved: return True, board
     
-    # 3. GNN Inference (One-Shot)
+    # 3. GNN Inference
     x = torch.tensor(board.flatten(), dtype=torch.long).unsqueeze(1).to(device)
     with torch.no_grad():
         out = model(x, edge_index)
-        cached_probs = torch.softmax(out, dim=1) # [81, 9]
+        cached_probs = torch.softmax(out, dim=1)
 
     # 4. Dynamic Recursion Start
-    success, final_board = recursive_dynamic_solve(board, cached_probs)
+    steps = [0]
+    success, final_board = recursive_dynamic_solve(board, cached_probs, start_time, timeout, steps)
     
+    # 타임아웃(None)이 반환되면 실패 처리
     if final_board is None:
         return False, initial_board
         
-    return True, final_board
+    return success, final_board

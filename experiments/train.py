@@ -98,9 +98,16 @@ def main():
     train_size = int(len(dataset) * 0.9)
     val_size = len(dataset) - train_size
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
-    
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
+    train_loader = DataLoader(train_dataset, 
+                              batch_size=args.batch_size, 
+                              shuffle=True,
+                              num_workers=4,
+                              pin_memory=True)
+    val_loader = DataLoader(val_dataset,
+                            batch_size=args.batch_size, 
+                            shuffle=False,
+                            num_workers=4,
+                            pin_memory=True)
     
     print(f"📊 Dataset: {len(dataset)} total | {len(train_dataset)} train | {len(val_dataset)} val")
 
