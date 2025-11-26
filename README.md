@@ -80,7 +80,7 @@ This project evolved through rigorous failure analysis:
 
 ### Installation
 ```bash
-git clone [https://github.com/YourUsername/NeuroSudoku.git](https://github.com/YourUsername/NeuroSudoku.git)
+git clone https://github.com/Injae-Yun/NeuroSudoku.git
 cd NeuroSudoku
 pip install -r requirements.txt
 ```
