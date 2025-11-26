@@ -41,13 +41,15 @@ Our solver is not just a neural network; it is a layered system.
 
 The true power of the GNN heuristic is revealed in adversarial puzzles designed to break traditional solvers.
 
-| Puzzle Name | Neuro-Symbolic (Ours) | Backtracking (Baseline) | Result |
+| Puzzle Name | Neuro-Symbolic (Ours) | Backtracking (Baseline) | Speedup / Result |
 | :--- | :--- | :--- | :--- |
 | **Platinum Blonde** | **6.79s** | > 60.00s (TIMEOUT) | **🚀 Neuro Wins** |
 | **Easter Monster** | **0.52s** | > 60.00s (TIMEOUT) | **🚀 Neuro Wins** |
 | **Norvig #1** | **0.25s** | 9.85s | **⚡ 39.9x Faster** |
 | **Golden Nugget** | **0.98s** | 6.43s | **6.6x Faster** |
+| **Unsolvable #28** | **0.04s** | 0.09s | **2.3x Faster** |
 | **Inkala 2010** | **0.10s** | 0.20s | **2.0x Faster** |
+| **AI Escargot** | **0.76s** | 1.04s | **1.4x Faster** |
 | Tarantula | 0.10s | **0.02s** | *0.1x (Overhead)* |
 | Norvig #2 | > 60.00s | > 60.00s | *DRAW (Too Hard)* |
 
