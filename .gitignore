@@ -1,0 +1,34 @@
+# 1. Python & System Artifacts (절대 올리면 안 됨)
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# 2. Virtual Environments (내 컴퓨터 설정)
+env/
+venv/
+.conda/
+
+# 3. IDE Settings (내 에디터 설정)
+.vscode/
+.idea/
+
+# 4. Data (Heavy Files)
+# 원본 데이터는 크니까 제외
+data/raw/*.csv
+data/raw/*.zip
+
+# (옵션) 혹시 만들었을지 모를 중간 처리 파일 제외
+data/processed/*.pt
+
+# ★ 중요: hard_indices.json은 올려야 함 (무시하지 않음)
+!data/hard_indices.json
+
+# 5. Models
+# 모든 모델 체크포인트를 다 올리면 용량 터짐
+models/*.pth
+# ★ 중요: 하지만 best_model.pth 하나는 포트폴리오용으로 올림 (예외 처리)
+!models/best_model.pth
+
+# 6. Logs & Debug
+*.log
