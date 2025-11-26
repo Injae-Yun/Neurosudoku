@@ -15,17 +15,19 @@ This project introduces a **Neuro-Symbolic Architecture** that bridges this gap.
 
 ---
 
-## 🚀 Key Results: Why This Matters
+## 🚀 Key Results: Performance Analysis
 
-We benchmarked the solver against an optimized Backtracking algorithm on puzzles of varying difficulty, including Arto Inkala's "AI Escargot" (known as the hardest Sudoku).
+We benchmarked the solver against an optimized Backtracking algorithm. The results demonstrate a clear trade-off between **fixed neural overhead** and **search efficiency**.
 
-| Difficulty | Dataset / Source | Backtracking (CPU) | **Neuro-Symbolic (Ours)** | Performance Analysis |
+| Difficulty | Dataset / Source | Backtracking (CPU) | **Neuro-Symbolic (Ours)** | Analysis |
 | :--- | :--- | :--- | :--- | :--- |
-| **Easy** | Kaggle (90k samples) | **< 0.001s** | ~0.002s | GNN overhead dominates on trivial tasks. |
-| **Hard** | Filtered (Top 1% Logic Depth) | 0.041s (High Variance) | **0.015s (Stable)** | **~2.7x Faster.** Neural intuition prunes the search tree effectively. |
-| **Extreme** | **Arto Inkala's Hardest** | 1.16s | **0.80s** | **~1.45x Faster.** Solves OOD (Out-of-Distribution) cases robustly. |
+| **Easy** | Kaggle (90k samples) | **< 0.004s** | ~0.003s | Solved mostly by **Constraint Propagation**. almost not use GNN module. |
+| **Hard** | Kaggle Filtered (Top 1%) | **~0.007s** | ~0.037s | Logic depth is not deep enough to offset the GNN inference cost (Host-to-Device transfer). |
+| **Extreme** | **Arto Inkala's Hardest** | 1.16s | **0.80s** | **~1.45x Faster.** The GNN heuristic significantly prunes the massive search tree, overcoming the initial overhead. |
 
-> **Insight:** While pure symbolic solvers get stuck in deep recursive branches on extreme puzzles, our Neuro-Symbolic agent uses "learned intuition" to pick the correct branch early, reducing the search space significantly.
+### 📊 Interpretation
+1.  **Easy & Hard Cases:** For standard puzzles, optimized Backtracking is extremely efficient due to CPU branch prediction. The Neuro-Symbolic approach incurs a fixed cost (GPU inference time), making it slightly slower.
+2.  **Extreme Cases (OOD):** When the puzzle requires deep recursive search (like Arto Inkala's "AI Escargot"), Backtracking slows down linearly with the search space. Here, our **Neuro-Symbolic architecture shines** by guiding the search to the correct branch early, demonstrating robustness on NP-hard instances.
 
 ![Benchmark Result](benchmark_hard.png)
 *(Generated via `experiments/evaluate_hard.py`)*
@@ -96,9 +98,11 @@ NeuroSudoku/
 ├── data/               # Dataset processing
 ├── models/             # GATv2 + GRU Architecture
 ├── solvers/            # Logic & Hybrid Solvers
-│   ├── propagation.py  # Constraint Propagation
-│   └── dynamic_solver.py # Final Master Solver
+│   ├── simple_propagation.py  # Constraint Propagation
+│   └── optimized_solver.py # Final Master Solver
 ├── experiments/        # Training & Benchmarking Scripts
+│   ├── train.py        # training model
+│   └── evaluate .. .py # model evaluating 
 ├── utils/              # Graph conversion & Visualization
 └── main.py             # CLI Entry point
 
