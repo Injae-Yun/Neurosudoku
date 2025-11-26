@@ -117,11 +117,11 @@ pip install -r requirements.txt
 ### Train 
 python experiments/train.py --epochs 10 --batch_size 64
 
-### solve (extream case)
-python experiments/evaluate_extream_case.py 
-
 ### run benchmarks : Compare Neuro-Symbolic vs Backtracking on hard cases.
 python experiments/evaluate_hard.py --samples 200
+
+### on extream case
+python experiments/evaluate_extream_case.py 
 
 ### Directory Structure
 ```text
